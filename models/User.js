@@ -1,22 +1,25 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
-const userSchema = new mongoose.Schema({
-    name:           { type: String, required: true},
-    email:          { type: String, required: true, unique: true},
-    password:       { type: String, required: true},
-    mobileNumber:   { type: String, required: true},
-    gender:         { type: String, required: true},
-    role:           { type: String, enum: ["admin", "customer"], required: true},
+
+//schema
+const UserSchema = new mongoose.Schema({
+  name: String,
+  email: { type: String, unique: true },
+  password: String,
+  mobileNumber: String,
+  gender: String,
+  role: { type: String, enum: ["admin", "customer"], default: "customer" },
 });
 
-//Hashing
-userSchema.Schema.pre("save", async function (next){
-    if (!this.isModified("password")) 
-        return next();
-    this.password = await bcrypt.hash(this.password, 10);
-    next();
+
+//hashing
+UserSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
 });
 
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+
+
+module.exports = mongoose.model("User", UserSchema);
